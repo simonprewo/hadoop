@@ -110,7 +110,7 @@ public final class XceiverClientRatis extends XceiverClientSpi {
     final RaftGroup group = RatisHelper.newRaftGroup(pipeline);
     LOG.debug("destroying pipeline:{} with {}", pipeline.getId(), group);
     callRatisRpc(pipeline.getMachines(), (raftClient, peer) -> raftClient
-        .groupRemove(group.getGroupId(), peer.getId()));
+        .groupRemove(group.getGroupId(), true, peer.getId()));
   }
 
   /**
@@ -208,6 +208,10 @@ public final class XceiverClientRatis extends XceiverClientSpi {
   public ContainerCommandResponseProto sendCommand(
       ContainerCommandRequestProto request) throws IOException {
     final RaftClientReply reply = sendRequest(request);
+    if (reply == null) {
+      throw new IOException(
+          String.format("Could not execute the request %s", request));
+    }
     Preconditions.checkState(reply.isSuccess());
     return ContainerCommandResponseProto.parseFrom(
         reply.getMessage().getContent());

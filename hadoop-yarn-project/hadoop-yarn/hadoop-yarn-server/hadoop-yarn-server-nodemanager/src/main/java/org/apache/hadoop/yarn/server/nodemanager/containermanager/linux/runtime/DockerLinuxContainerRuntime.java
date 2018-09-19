@@ -1282,7 +1282,7 @@ public class DockerLinuxContainerRuntime implements LinuxContainerRuntime {
             DockerInspectCommand.STATUS_TEMPLATE,
             DockerInspectCommand.STOPSIGNAL_TEMPLATE}, delimiter);
     try {
-      String output = executeDockerInspect(containerId, inspectCommand);
+      String output = executeDockerInspect(containerId, inspectCommand).trim();
 
       if (!output.isEmpty()) {
         String[] statusAndSignal = StringUtils.split(output, delimiter);
@@ -1382,7 +1382,8 @@ public class DockerLinuxContainerRuntime implements LinuxContainerRuntime {
           DockerCommandExecutor.getContainerStatus(containerId,
               privilegedOperationExecutor, nmContext);
       if (DockerCommandExecutor.isRemovable(containerStatus)) {
-        DockerRmCommand dockerRmCommand = new DockerRmCommand(containerId);
+        DockerRmCommand dockerRmCommand = new DockerRmCommand(containerId,
+            ResourceHandlerModule.getCgroupsRelativeRoot());
         DockerCommandExecutor.executeDockerCommand(dockerRmCommand, containerId,
             env, privilegedOperationExecutor, false, nmContext);
       }

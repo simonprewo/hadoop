@@ -274,12 +274,6 @@ public class ContainerMapping implements Mapping {
     ContainerInfo containerInfo;
     ContainerWithPipeline containerWithPipeline;
 
-    if (!nodeManager.isOutOfChillMode()) {
-      throw new SCMException(
-          "Unable to create container while in chill mode",
-          SCMException.ResultCodes.CHILL_MODE_EXCEPTION);
-    }
-
     lock.lock();
     try {
       containerWithPipeline = containerStateManager.allocateContainer(
@@ -470,24 +464,6 @@ public class ContainerMapping implements Mapping {
     Pipeline pipeline = pipelineSelector
         .getPipeline(containerInfo.getPipelineID());
     return new ContainerWithPipeline(containerInfo, pipeline);
-  }
-
-  public void handlePipelineClose(PipelineID pipelineID) {
-    try {
-      Pipeline pipeline = pipelineSelector.getPipeline(pipelineID);
-      if (pipeline != null) {
-        pipelineSelector.finalizePipeline(pipeline);
-      } else {
-        LOG.debug("pipeline:{} not found", pipelineID);
-      }
-    } catch (Exception e) {
-      LOG.info("failed to close pipeline:{}", pipelineID, e);
-    }
-  }
-
-  public Set<PipelineID> getPipelineOnDatanode(
-      DatanodeDetails datanodeDetails) {
-    return pipelineSelector.getPipelineId(datanodeDetails.getUuid());
   }
 
   /**
@@ -716,7 +692,6 @@ public class ContainerMapping implements Mapping {
     return containerStore;
   }
 
-  @VisibleForTesting
   public PipelineSelector getPipelineSelector() {
     return pipelineSelector;
   }

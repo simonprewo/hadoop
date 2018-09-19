@@ -136,6 +136,7 @@ public class TestKeys {
     ozoneCluster = MiniOzoneCluster.newBuilder(conf)
         .setNumDatanodes(1)
         .setHbInterval(1000)
+        .setHbProcessorInterval(1000)
         .build();
     ozoneCluster.waitForClusterToBeReady();
     client = new RpcClient(conf);
